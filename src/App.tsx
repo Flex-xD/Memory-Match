@@ -3,22 +3,18 @@ import Card from "./Card";
 
 const App = () => {
 
-  const cardSpecs = {
-    isFlipped: false,
-    value: ""
-  }
-
   type TCardSpecs = {
     isFlipped: boolean,
     value: string
   }
 
   const fruits = ["🍇", "🍈", "🍉", "🍊", "🍋", "🍋‍🟩", "🍌", "🍍", "🍇", "🍈", "🍉", "🍊", "🍋", "🍋‍🟩", "🍌", "🍍"];
-  const [cards, setCards] = useState<(TCardSpecs)[]>(fruits.map((fruit , fruitIndex) => (
+  const [cards, setCards] = useState<(TCardSpecs)[]>(fruits.map((fruit, fruitIndex) => (
     {
       isFlipped: false,
-      value: fruit , 
-      arrayIndex:fruitIndex
+      value: fruit,
+      arrayIndex: fruitIndex,
+      isMatched: false
     }
   )));
 
@@ -29,9 +25,21 @@ const App = () => {
     console.log(updatedCards);
   }
 
-  // const handlePlayerMove = (CardIndex:number) => {
-  //   const updatedCards = [...cards];
-  // }
+  const handleCardMatch = (cardIndex: number) => {
+    const updatedCards = [...cards];
+    const clickedCard = updatedCards[cardIndex];
+    if (clickedCard.isFlipped == false) return;
+      let i: number = 0;
+    while (i < cards.length) {
+      if (clickedCard.value === updatedCards[i].value && clickedCard.isFlipped === true && updatedCards[i].isFlipped === false) {
+        clickedCard.isFlipped = true;
+        updatedCards[i].isFlipped = true;
+        alert("Cards Have been matched")
+        return;
+      }
+      i++;
+    }
+  }
 
   return (
     <div className="min-h-screen flex justify-center items-center bg-amber-300">
@@ -39,10 +47,13 @@ const App = () => {
         {
           cards.map((_, CardIndex) => (
             <Card
+              key={CardIndex}
               flipped={cards[CardIndex].isFlipped}
               CardIndex={CardIndex}
               value={cards[CardIndex].value}
-              handleCardFlip={() => handleCardFlip(CardIndex)} />
+              handleCardFlip={() => handleCardFlip(CardIndex)}
+              handleCardMatch={() => handleCardMatch(CardIndex)}
+            />
           ))
         }
       </div>
