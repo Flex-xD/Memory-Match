@@ -20,26 +20,25 @@ const App = () => {
 
   const handleCardFlip = (cardIndex: number) => {
     const updatedCards = [...cards];
-    updatedCards[cardIndex].isFlipped = true;
+    const clickedCard = updatedCards[cardIndex];
+    clickedCard.isFlipped = !updatedCards[cardIndex].isFlipped;
+
+    // ? THINGS I HAVE TOD DO:
+    // 1. Check whether the Card already has a match and both cards are flipped , then return and let them both be flipped;
+    for (let i = 0; i < updatedCards.length; i++) {
+      if (i !== cardIndex && clickedCard.isFlipped === true && clickedCard.value === updatedCards[i].value) {
+        if (updatedCards[i].isFlipped) {
+          alert("Your cards matched !")
+          
+        }
+      }
+    }
+    // 2. If 2nd flipped Card dosen't match then , unflip the both cards
+
+
     setCards(updatedCards);
-    console.log(updatedCards);
   }
 
-  const handleCardMatch = (cardIndex: number) => {
-    const updatedCards = [...cards];
-    const clickedCard = updatedCards[cardIndex];
-    if (clickedCard.isFlipped == false) return;
-      let i: number = 0;
-    while (i < cards.length) {
-      if (clickedCard.value === updatedCards[i].value && clickedCard.isFlipped === true && updatedCards[i].isFlipped === false) {
-        clickedCard.isFlipped = true;
-        updatedCards[i].isFlipped = true;
-        alert("Cards Have been matched")
-        return;
-      }
-      i++;
-    }
-  }
 
   return (
     <div className="min-h-screen flex justify-center items-center bg-amber-300">
@@ -52,7 +51,6 @@ const App = () => {
               CardIndex={CardIndex}
               value={cards[CardIndex].value}
               handleCardFlip={() => handleCardFlip(CardIndex)}
-              handleCardMatch={() => handleCardMatch(CardIndex)}
             />
           ))
         }
