@@ -6,12 +6,13 @@ const App = () => {
   type TCardSpecs = {
     isFlipped: boolean,
     value: string
+    isMatched: boolean;
   }
 
   const fruits = ["🍇", "🍈", "🍉", "🍊", "🍋", "🍋‍🟩", "🍌", "🍍", "🍇", "🍈", "🍉", "🍊", "🍋", "🍋‍🟩", "🍌", "🍍"];
   const [cards, setCards] = useState<(TCardSpecs)[]>(fruits.map((fruit, fruitIndex) => (
     {
-      isFlipped: false,
+      isFlipped:false,
       value: fruit,
       arrayIndex: fruitIndex,
       isMatched: false
@@ -28,11 +29,29 @@ const App = () => {
     for (let i = 0; i < updatedCards.length; i++) {
       if (i !== cardIndex && clickedCard.isFlipped === true && clickedCard.value === updatedCards[i].value) {
         if (updatedCards[i].isFlipped) {
-          alert("Your cards matched !")
-          
+          clickedCard.isMatched = true;
+          updatedCards[i].isMatched = true;
         }
+        // IF THE CARDS ARE MATCHED , THEN THEY SHOULD REMAIN FLIPPED
+        // if (clickedCard.isMatched === true && updatedCards[i].isMatched === true) {
+        //   if (clickedCard.isFlipped !== true || updatedCards[i].isFlipped !== true) {
+        //     clickedCard.isFlipped = true;
+        //     updatedCards[i].isFlipped = true;
+        //   }
+        // }
+        // LET THE BOTH CARDS BE FLIPPED AND USER CAN'T CHANGE THEM !
+
+      } else if (i !== cardIndex && clickedCard.isFlipped === true && clickedCard.value !== updatedCards[i].value) {
+        if (updatedCards[i].isFlipped === true) {
+          updatedCards[i].isMatched = false;
+          clickedCard.isMatched = false;
+          updatedCards[i].isFlipped = false;
+          clickedCard.isFlipped = false;
+        }
+
       }
     }
+
     // 2. If 2nd flipped Card dosen't match then , unflip the both cards
 
 
@@ -51,6 +70,7 @@ const App = () => {
               CardIndex={CardIndex}
               value={cards[CardIndex].value}
               handleCardFlip={() => handleCardFlip(CardIndex)}
+              isMatched={cards[CardIndex].isMatched}
             />
           ))
         }
