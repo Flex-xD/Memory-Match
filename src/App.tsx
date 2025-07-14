@@ -1,82 +1,89 @@
 import { useState } from "react";
 import Card from "./Card";
 
-const App = () => {
+type TCard = {
+  id: number;
+  value: string;
+  isFlipped: boolean;
+  isMatched: boolean;
+};
 
-  type TCardSpecs = {
-    isFlipped: boolean,
-    value: string
-    isMatched: boolean;
-  }
+const emojiList = ["🍇", "🍈", "🍉", "🍊", "🍋", "🍌", "🍍", "🥝"];
 
-  const fruits = ["🍇", "🍈", "🍉", "🍊", "🍋", "🍋‍🟩", "🍌", "🍍", "🍇", "🍈", "🍉", "🍊", "🍋", "🍋‍🟩", "🍌", "🍍"];
-  const [cards, setCards] = useState<(TCardSpecs)[]>(fruits.map((fruit, fruitIndex) => (
-    {
-      isFlipped:false,
-      value: fruit,
-      arrayIndex: fruitIndex,
-      isMatched: false
-    }
-  )));
+// Shuffle cards and assign id
+const getShuffledCards = (): TCard[] => {
+  const cards = [...emojiList, ...emojiList].map((value, index) => ({
+    id: index,
+    value,
+    isFlipped: false,
+    isMatched: false,
+  }));
+  return cards.sort(() => Math.random() - 0.5);
+};
 
-  const handleCardFlip = (cardIndex: number) => {
-    const updatedCards = [...cards];
-    const clickedCard = updatedCards[cardIndex];
-    clickedCard.isFlipped = !updatedCards[cardIndex].isFlipped;
+export default function App() {
+  const [cards, setCards] = useState<TCard[]>(getShuffledCards());
+  const [flipped, setFlipped] = useState<number[]>([]);
+  const [disabled, setDisabled] = useState(false);
 
-    // ? THINGS I HAVE TOD DO:
-    // 1. Check whether the Card already has a match and both cards are flipped , then return and let them both be flipped;
-    for (let i = 0; i < updatedCards.length; i++) {
-      if (i !== cardIndex && clickedCard.isFlipped === true && clickedCard.value === updatedCards[i].value) {
-        if (updatedCards[i].isFlipped) {
-          clickedCard.isMatched = true;
-          updatedCards[i].isMatched = true;
-        }
-        // IF THE CARDS ARE MATCHED , THEN THEY SHOULD REMAIN FLIPPED
-        // if (clickedCard.isMatched === true && updatedCards[i].isMatched === true) {
-        //   if (clickedCard.isFlipped !== true || updatedCards[i].isFlipped !== true) {
-        //     clickedCard.isFlipped = true;
-        //     updatedCards[i].isFlipped = true;
-        //   }
-        // }
-        // LET THE BOTH CARDS BE FLIPPED AND USER CAN'T CHANGE THEM !
+  const handleFlip = (index: number) => {
+    if (disabled) return;
+    if (cards[index].isFlipped || cards[index].isMatched) return;
 
-      } else if (i !== cardIndex && clickedCard.isFlipped === true && clickedCard.value !== updatedCards[i].value) {
-        if (updatedCards[i].isFlipped === true) {
-          updatedCards[i].isMatched = false;
-          clickedCard.isMatched = false;
-          updatedCards[i].isFlipped = false;
-          clickedCard.isFlipped = false;
-        }
+    const newCards = [...cards];
+    newCards[index].isFlipped = true;
+    const newFlipped = [...flipped, index];
 
+    setCards(newCards);
+    setFlipped(newFlipped);
+
+    if (newFlipped.length === 2) {
+      const [first, second] = newFlipped;
+      const isMatch = newCards[first].value === newCards[second].value;
+
+      if (isMatch) {
+        newCards[first].isMatched = true;
+        newCards[second].isMatched = true;
+        setCards(newCards);
+        setFlipped([]);
+      } else {
+        setDisabled(true);
+        setTimeout(() => {
+          newCards[first].isFlipped = false;
+          newCards[second].isFlipped = false;
+          setCards(newCards);
+          setFlipped([]);
+          setDisabled(false);
+        }, 1000);
       }
     }
+  };
 
-    // 2. If 2nd flipped Card dosen't match then , unflip the both cards
-
-
-    setCards(updatedCards);
-  }
-
+  const restartGame = () => {
+    setCards(getShuffledCards());
+    setFlipped([]);
+    setDisabled(false);
+  };
 
   return (
-    <div className="min-h-screen flex justify-center items-center bg-amber-300">
-      <div className="h-156 w-3/6 border bg-gray-100 grid grid-rows-4 grid-cols-4 place-items-center">
-        {
-          cards.map((_, CardIndex) => (
-            <Card
-              key={CardIndex}
-              flipped={cards[CardIndex].isFlipped}
-              CardIndex={CardIndex}
-              value={cards[CardIndex].value}
-              handleCardFlip={() => handleCardFlip(CardIndex)}
-              isMatched={cards[CardIndex].isMatched}
-            />
-          ))
-        }
+    <div className="min-h-screen bg-yellow-200 flex flex-col items-center justify-center gap-6 p-4">
+      <h1 className="text-3xl font-bold text-gray-700">Memory Game 🧠</h1>
+      <button
+        onClick={restartGame}
+        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+      >
+        Restart
+      </button>
+      <div className="grid grid-cols-4 gap-4">
+        {cards.map((card, index) => (
+          <Card
+            key={card.id}
+            value={card.value}
+            flipped={card.isFlipped || card.isMatched}
+            onFlip={() => handleFlip(index)}
+          />
+        ))}
       </div>
     </div>
-  )
+  );
 }
-
-export default App;

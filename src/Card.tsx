@@ -1,32 +1,26 @@
-
 type CardProps = {
     value: string;
-    CardIndex: number
-    handleCardFlip: (key: number) => void;
-    flipped?: boolean
-    isMatched: boolean
+    flipped: boolean;
+    onFlip: () => void;
 };
 
-
-export default function Card(props: CardProps) {
-    const { CardIndex, value, flipped = false, handleCardFlip, isMatched } = props
-
+export default function Card({ value, flipped, onFlip }: CardProps) {
     return (
         <div
-            onClick={() => handleCardFlip(CardIndex)}
-            className="w-20 h-28 sm:w-24 sm:h-32 md:w-28 md:h-36 perspective cursor-pointer"
+            onClick={onFlip}
+            className="w-24 h-32 sm:w-28 sm:h-36 md:w-32 md:h-40 perspective cursor-pointer"
         >
             <div
-                className={`relative w-full h-full transition-transform duration-500 transform-style preserve-3d  ${isMatched ? `rotate-y-180` : flipped ? "rotate-y-180" : ""
+                className={`relative w-full h-full transition-transform duration-500 transform-style preserve-3d ${flipped ? "rotate-y-180" : ""
                     }`}
             >
-                {/* Front (hidden side) */}
-                <div className="absolute w-full h-full bg-blue-500 rounded-xl text-white flex items-center justify-center backface-hidden">
+                {/* Front Side */}
+                <div className="absolute w-full h-full bg-blue-500 text-white text-3xl rounded-xl flex items-center justify-center backface-hidden shadow-xl">
                     ❓
                 </div>
 
-                {/* Back (visible on flip) */}
-                <div className="absolute w-full h-full bg-white border-2 border-blue-400 rounded-xl text-3xl flex items-center justify-center rotate-y-180 backface-hidden">
+                {/* Back Side */}
+                <div className="absolute w-full h-full bg-white text-3xl border-2 border-blue-400 rounded-xl flex items-center justify-center rotate-y-180 backface-hidden shadow-xl">
                     {value}
                 </div>
             </div>
